@@ -1,36 +1,127 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Alpron Aqua Solutions Website
 
-## Getting Started
+Production-oriented Next.js App Router website with a database-backed product catalogue, Supabase authentication/storage, protected role-based administration, private enquiry handling, technical SEO, and verified-only business facts.
 
-First, run the development server:
+## Requirements
 
-```bash
+- Node.js 22 or newer (Node.js 24 LTS/current is recommended for the locked dependencies)
+- npm 10 or newer
+- Docker Desktop for the local Supabase stack
+- A Supabase project and Vercel account for production
+
+## Local setup
+
+```powershell
+Copy-Item .env.example .env.local
+npm install
+npx supabase start
+npx supabase db reset
+npm run admin:create -- admin@example.com
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`. The local Supabase command prints the URL, publishable/anon key and service-role key; copy them into `.env.local`. Generate a random `RATE_LIMIT_HMAC_SECRET` of at least 32 bytes.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The public website renders safe category-only fallback content when Supabase is absent. Database writes, login, media upload and real enquiries deliberately remain unavailable until Supabase is configured.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## First administrator
 
-## Learn More
+`npm run admin:create -- admin@example.com` prompts for the display name and password. Password input is hidden and is never accepted as a command-line argument. The script creates a confirmed Supabase Auth user and an active `super_admin` profile. It deletes the Auth user if profile creation fails.
 
-To learn more about Next.js, take a look at the following resources:
+There is no public sign-up route. Additional administrators should be created by a trusted super administrator or an audited server-side provisioning workflow.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Variable | Exposure | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Public | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public | RLS-constrained browser/server key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server only | Enquiry inserts, validated media and admin bootstrap |
+| `NEXT_PUBLIC_SITE_URL` | Public | Canonical origin |
+| `RATE_LIMIT_HMAC_SECRET` | Server only | Pseudonymizes rate-limit keys |
+| `GOOGLE_SITE_VERIFICATION` | Server-rendered metadata | Optional real verification token |
+| `NEXT_PUBLIC_GA_ID` | Public | Reserved; no analytics loads while blank |
 
-## Deploy on Vercel
+Never expose the service-role key, database password or HMAC secret with a `NEXT_PUBLIC_` prefix.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Database and storage
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Migrations in `supabase/migrations` create:
+
+- Admin roles and immutable authorization profiles
+- Categories, products, ordered images/specifications and integer-paise pricing
+- Pages, page versions, site settings and verified business facts
+- Private enquiries, notes and audit events
+- Atomic database rate-limit buckets
+- A restricted `product-media` bucket
+- Row-level-security policies and transactional product saving
+
+Migration `202607200003_verified_business_catalogue.sql` also adds editable
+homepage and ordering copy, product provenance and verification fields,
+verified operating-location/map facts, and idempotent upserts for the six
+products recorded on the Alpron IndiaMART seller page. It does not import
+marketplace recommendations, unverified prices or third-party photography.
+
+Local reset:
+
+```powershell
+npx supabase db reset
+```
+
+Linked production migration:
+
+```powershell
+npx supabase login
+npx supabase link --project-ref YOUR_PROJECT_REF
+npx supabase db push
+npx supabase gen types typescript --linked | Set-Content src/lib/database.types.ts
+```
+
+Inspect generated type changes before committing them.
+
+## Verification
+
+```powershell
+npm run lint
+npm run typecheck
+npm run test
+npm run build
+npm run test:e2e
+npm audit --omit=dev
+```
+
+Database integration tests are skipped unless `RUN_SUPABASE_INTEGRATION=true` and the Supabase variables are present. Playwright starts the application with the configured environment.
+
+## Vercel deployment
+
+1. Create the production Supabase project and apply migrations.
+2. Create the first administrator.
+3. Import this repository into Vercel with the Next.js preset and Node.js 24.
+4. Add every environment variable separately for Production and Preview.
+5. Set `NEXT_PUBLIC_SITE_URL` to the final HTTPS origin.
+6. Add the production origin to Supabase Auth Site URL and redirect allowlist, including `/auth/callback`.
+7. Deploy, then run the route, authorization, enquiry and CRUD acceptance checks.
+8. Configure the custom domain only after legal/contact facts and legal pages are approved.
+
+No production deployment can be completed without the client’s Supabase, Vercel and domain credentials.
+
+## Backups and operations
+
+- Enable Supabase point-in-time recovery or scheduled backups appropriate to the plan.
+- Export inquiries before destructive maintenance and restrict operational access.
+- Rotate the service-role key and HMAC secret after any suspected exposure.
+- Review audit events and stale admin accounts periodically.
+- Update dependencies with security advisories in mind; never use `npm audit fix --force` without reviewing breaking changes.
+
+## Client launch checklist
+
+- Confirm legal entity, GST, proprietor/authorized contact and addresses
+- Approve the direct public phone, WhatsApp and email; directory routing numbers are not used
+- Confirm the published Sahibabad operating address and the separate Dilshad Garden address
+- Approve every product name, model, specification, price, MOQ and availability
+- Supply owned/licensed logo and product photography with alt-text context
+- Confirm warranty, installation, service, delivery and certification claims
+- Obtain legal review of privacy policy and terms
+- Provide the production domain, analytics ID and Search Console token
+
+See `BUSINESS_DATA_NOTES.md` for source-by-source research and conflicts.
