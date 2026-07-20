@@ -1,30 +1,73 @@
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Droplets, Menu, Phone } from "lucide-react";
+import { ArrowUpRight, Menu, Phone } from "lucide-react";
 import { ButtonLink } from "@/components/ui";
 import { DesktopNavigation, MobileNavigation } from "@/components/site-navigation";
-import { businessFactsByKey, phoneHref } from "@/lib/business";
+import {
+  businessFactsByKey,
+  phoneHref,
+  safeBrandAssetUrl,
+} from "@/lib/business";
 import type { BusinessFact } from "@/lib/data";
 
-export function BrandMark({ inverse = false }: { inverse?: boolean }) {
+const defaultPrimaryLogo =
+  "/assets/brand/alpron-logo-horizontal-transparent.png";
+const defaultCompactLogo = "/assets/brand/alpron-logo-mark-transparent.png";
+
+export function BrandMark({
+  facts = [],
+  inverse = false,
+  compactOnMobile = true,
+}: {
+  facts?: BusinessFact[];
+  inverse?: boolean;
+  compactOnMobile?: boolean;
+}) {
+  const byKey = businessFactsByKey(facts);
+  const primaryLogo =
+    safeBrandAssetUrl(byKey.primary_logo_url) || defaultPrimaryLogo;
+  const compactLogo =
+    safeBrandAssetUrl(byKey.compact_logo_url) || defaultCompactLogo;
+
   return (
-    <Link href="/" className="group inline-flex items-center gap-3" aria-label="Alpron Aqua Solutions home">
+    <Link
+      href="/"
+      className={`group inline-flex shrink-0 items-center rounded-2xl transition ${
+        inverse
+          ? "bg-white/95 px-3 py-2 shadow-[0_12px_35px_rgba(0,0,0,0.14)]"
+          : "focus-visible:outline-offset-4"
+      }`}
+      aria-label="Alpron Aqua Solutions home"
+    >
       <span
-        aria-hidden="true"
-        className={`brand-mark grid size-11 place-items-center rounded-[1.05rem] border text-sm font-black ${
-          inverse
-            ? "border-white/25 bg-white/10 text-white group-hover:bg-white/15"
-            : "border-[#aad5dc] bg-[#dff7f8] text-[#006b7d] group-hover:border-[#69cbd3] group-hover:bg-[#c9f2f3]"
+        className={`relative block transition-transform duration-300 group-hover:scale-[1.015] ${
+          compactOnMobile
+            ? "h-11 w-[50px] sm:h-[58px] sm:w-[198px]"
+            : "h-[58px] w-[198px]"
         }`}
       >
-        <Droplets className="size-5" aria-hidden="true" />
-      </span>
-      <span className="grid leading-none">
-        <span className={`text-base font-bold tracking-[-0.02em] ${inverse ? "text-white" : "text-[#072a47]"}`}>
-          ALPRON AQUA
-        </span>
-        <span className={`mt-1 text-[0.62rem] font-semibold tracking-[0.24em] ${inverse ? "text-white/65" : "text-[#50707d]"}`}>
-          SOLUTIONS
-        </span>
+        {compactOnMobile ? (
+          <Image
+            src={compactLogo}
+            alt="Alpron Aqua Solutions logo"
+            fill
+            priority
+            unoptimized
+            sizes="50px"
+            className="object-contain sm:hidden"
+          />
+        ) : null}
+        <Image
+          src={primaryLogo}
+          alt="Alpron Aqua Solutions logo"
+          fill
+          priority
+          unoptimized
+          sizes="198px"
+          className={`object-contain ${
+            compactOnMobile ? "hidden sm:block" : "block"
+          }`}
+        />
       </span>
     </Link>
   );
@@ -42,7 +85,7 @@ export function SiteHeader({ facts }: { facts: BusinessFact[] }) {
         </div>
       </div>
       <div className="container-shell flex min-h-[4.75rem] items-center justify-between gap-6">
-        <BrandMark />
+        <BrandMark facts={facts} />
         <DesktopNavigation />
         <div className="hidden items-center gap-2 md:flex">
           {callHref ? (

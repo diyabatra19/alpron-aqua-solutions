@@ -44,6 +44,9 @@ yarn-error.log*
 /supabase/.branches/
 /supabase/.temp/
 
+# private client source documents and unused originals
+/client-reference/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -71,8 +71,14 @@ export default async function AboutPage() {
               ) : null}
               {byKey.address ? (
                 <div>
-                  <dt className="text-xs uppercase tracking-[0.12em] text-white/50">Operating location</dt>
+                  <dt className="text-xs uppercase tracking-[0.12em] text-white/50">Corporate office</dt>
                   <dd className="mt-2 flex gap-3 text-sm leading-6 text-white/75"><MapPin className="mt-0.5 size-4 shrink-0 text-[#65dbe2]" aria-hidden="true" />{byKey.address}</dd>
+                </div>
+              ) : null}
+              {byKey.business_capabilities ? (
+                <div>
+                  <dt className="text-xs uppercase tracking-[0.12em] text-white/50">Water-treatment capabilities</dt>
+                  <dd className="mt-2 text-sm font-semibold leading-6 text-white/80">{byKey.business_capabilities}</dd>
                 </div>
               ) : null}
             </dl>

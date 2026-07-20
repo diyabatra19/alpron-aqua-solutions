@@ -25,7 +25,7 @@ import { getBusinessFacts, getProducts, getSiteSettings } from "@/lib/data";
 export const metadata: Metadata = {
   title: "Contact & Quotation Request",
   description:
-    "Contact Alpron Aqua Solutions in Sahibabad or submit a product and quotation enquiry.",
+    "Contact Alpron Aqua Solutions at its Dilshad Garden corporate office or submit a product and quotation enquiry.",
   alternates: { canonical: "/contact" },
 };
 
@@ -37,6 +37,8 @@ export default async function ContactPage() {
   ]);
   const byKey = businessFactsByKey(facts);
   const callHref = phoneHref(byKey.phone);
+  const secondaryCallHref = phoneHref(byKey.phone_secondary);
+  const landlineHref = phoneHref(byKey.telephone);
   const emailHref = mailHref(byKey.email);
   const chatHref = whatsappHref(
     byKey.whatsapp,
@@ -57,7 +59,7 @@ export default async function ContactPage() {
         <div className="container-shell grid gap-5 lg:grid-cols-3">
           <Reveal className="contact-info-tile">
             <MapPin className="size-6 text-[#00899b]" aria-hidden="true" />
-            <p className="mt-8 text-xs font-bold uppercase tracking-[0.14em] text-[#68808a]">Operating location</p>
+            <p className="mt-8 text-xs font-bold uppercase tracking-[0.14em] text-[#68808a]">Corporate office</p>
             <p className="mt-3 text-base font-semibold leading-7 text-[#072f4c]">
               {byKey.address || "Address awaiting client verification"}
             </p>
@@ -86,10 +88,23 @@ export default async function ContactPage() {
               Alpron Aqua Solutions
             </p>
             <p className="mt-2 text-sm leading-6 text-[#617681]">
-              {byKey.business_type || "RO water-purification product enquiries"}
+              {byKey.contact_person
+                ? `Contact: ${byKey.contact_person}`
+                : byKey.business_type || "RO water-purification product enquiries"}
             </p>
           </Reveal>
         </div>
+        {byKey.regional_office ? (
+          <Reveal className="mt-5 rounded-[1.5rem] border border-[#d4e5e9] bg-white p-6 shadow-[0_16px_45px_rgba(4,43,67,0.04)]">
+            <div className="flex gap-4">
+              <MapPin className="mt-1 size-5 shrink-0 text-[#00899b]" aria-hidden="true" />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#68808a]">Regional office</p>
+                <p className="mt-2 text-sm font-semibold leading-6 text-[#294c5c]">{byKey.regional_office}</p>
+              </div>
+            </div>
+          </Reveal>
+        ) : null}
       </section>
 
       <section className="pb-[clamp(4rem,8vw,7rem)]">
@@ -129,6 +144,16 @@ export default async function ContactPage() {
                   <Phone className="size-4" aria-hidden="true" /> Call now
                 </ButtonLink>
               ) : null}
+              {secondaryCallHref ? (
+                <ButtonLink href={secondaryCallHref} variant="secondary" className="justify-start">
+                  <Phone className="size-4" aria-hidden="true" /> {byKey.phone_secondary}
+                </ButtonLink>
+              ) : null}
+              {landlineHref ? (
+                <ButtonLink href={landlineHref} variant="secondary" className="justify-start">
+                  <Phone className="size-4" aria-hidden="true" /> {byKey.telephone}
+                </ButtonLink>
+              ) : null}
               {chatHref ? (
                 <ButtonLink href={chatHref} variant="quiet" className="justify-start">
                   <MessageCircle className="size-4" aria-hidden="true" /> WhatsApp us
@@ -140,7 +165,7 @@ export default async function ContactPage() {
                 </ButtonLink>
               ) : null}
             </div>
-            {!callHref && !chatHref && !emailHref ? (
+            {!callHref && !secondaryCallHref && !landlineHref && !chatHref && !emailHref ? (
               <div className="mt-8 rounded-2xl border border-[#b9dfe3] bg-white/70 p-5 text-sm leading-6 text-[#07586a]">
                 Direct phone, WhatsApp and email buttons remain hidden until the client verifies them. The enquiry form is fully available.
               </div>

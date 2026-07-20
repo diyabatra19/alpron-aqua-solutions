@@ -6,10 +6,38 @@ Checked on **20 July 2026**. Directory data is evidence for catalogue preparatio
 
 | Source | URL | Access result |
 | --- | --- | --- |
+| Client business card | `WhatsApp Image 2026-07-20 at 9.37.58 PM.jpeg` (private client source; original stored only in ignored `client-reference/`) | Read on 20 July 2026. Safe public contact and office details were extracted; the certification statement remains unpublished. |
+| Client offer letter | `Offer Letter NS Ispat Raipur (1).pdf` (private client source; original stored only in ignored `client-reference/`) | Read on 20 July 2026. Used only to corroborate business contact details and genuine industrial water-treatment capability. All customer, banking, price, payment and commercial data was excluded. |
 | IndiaMART | https://www.indiamart.com/alpron-aqua-solution/ | Seller homepage and both catalogue pages were reachable by an HTTP request on 20 July 2026. Product names, page IDs, price labels and image URLs below were read from the seller-owned catalogue markup. |
 | Justdial | https://www.justdial.com/Sahibabad/Alpron-Aqua-Solutions-Pvt-Ltd-Vikram-Enclave-Shalimar-Garden-Shalimar-Garden-Extension-I/011PXX11-XX11-110430122841-V1Q5_BZDET | Accessible in the signed-in browser. Visible listing content and the page’s LocalBusiness structured data were checked. |
 | TradeIndia | https://www.tradeindia.com/alpron-aqua-solutions-33057429/ | Accessible. The seller profile, seller details and structured data were checked. |
 | MCA strike-off notices | https://www.mca.gov.in/Ministry/pdf/RocDelhiSTK5_18062018.pdf and https://www.mca.gov.in/Ministry/pdf/STK7DelhiNotice_09082018.pdf | Official notices contain a similarly named private-limited company and create a legal-identity conflict that must be resolved by the client. |
+
+## Client-provided document findings
+
+The business card and the April 2026 Alpron Aqua Solutions letterhead are
+independent client-provided items that display the same contact and office
+details. They are stronger evidence for direct contact information than
+marketplace call-routing data.
+
+| Extracted fact | Value displayed | Source file(s) | Verification and publication decision |
+| --- | --- | --- | --- |
+| Public brand | Alpron Aqua Solutions | Business card and offer letter | Confirmed by both client files and the directory sources; public. |
+| Contact person | S.H. Khan | Business card and offer letter | Confirmed by both client files; public as displayed. Do not expand the initials without client documentation. |
+| Landline | `011-23363216` | Business card and offer letter | Confirmed by both client files; public. |
+| Primary mobile | `9717459519` | Business card and offer letter | Confirmed by both client files; public as a telephone number. WhatsApp use is not confirmed. |
+| Additional mobile | `8802242582` | Business card and offer letter | Confirmed by both client files; public as a telephone number. WhatsApp use is not confirmed. |
+| Email | `sanjarhassankhan@gmail.com` | Business card and offer letter | Confirmed by both client files; public. |
+| Corporate office | M-20/A-4, Dilshad Garden, Delhi-110095 | Business card and offer letter | Confirmed by both client files; public and used as the corporate-office map query. |
+| Regional office | MIG (S)-189, Kabir Nagar, Hira Pur, Raipur (C.G.) | Business card and offer letter | Confirmed by both client files; public as a regional-office address. |
+| Existing website | `www.alpronaqua.com` | Business card and offer letter | Confirmed by both client files; public. |
+| Core services | Water purifiers; domestic and commercial RO systems; cooling-water and boiler-water treatment chemicals | Business card and offer letter | Confirmed by both client files; safe paraphrased public capability description. |
+| Industrial water softeners | A customer-specific water-softener proposal using an MS vessel, internal FRP coating and ion-exchange resin | Offer letter | Genuine technical experience is supported. Customer-specific design figures are not published as a standard product specification. |
+| Quality certification claim | ISO 9001:2008 Certified | Business card and offer letter | Unpublished. A valid current certificate and scope are required before any certification claim appears publicly. |
+
+The private offer letter also contains customer-specific contact, quotation,
+price, tax, payment, banking and technical-sizing data. Those values were not
+copied into this file, the database, website source or public assets.
 
 ## IndiaMART findings
 
@@ -101,12 +129,15 @@ TradeIndia’s “Products You May Be Interested In” area names other sellers 
 
 ## Confirmed or high-confidence public information
 
-- **Public brand:** Alpron Aqua Solutions — IndiaMART and TradeIndia.
+- **Public brand:** Alpron Aqua Solutions — both client documents, IndiaMART and TradeIndia.
 - **Business positioning:** manufacturer and supplier of water-purification products — manufacturer supported by Justdial and TradeIndia; supplier supported by TradeIndia.
 - **Core categories:** RO water purifiers, RO water purifier bodies and water filters — IndiaMART and TradeIndia.
-- **Customer-facing operating location:** the full Sahibabad address shown by Justdial, the designated primary contact/location source.
-- **Operating hours:** Monday–Saturday, 9:30 AM–6:30 PM, Sunday closed — Justdial structured data.
-- **Delhi address context:** Dilshad Garden appears on IndiaMART and TradeIndia, but it is treated as a possible seller/registered address and is never merged with the Sahibabad operating address.
+- **Direct contact information:** the landline, two mobile numbers and email above are repeated on both client-provided documents.
+- **Corporate office:** M-20/A-4, Dilshad Garden, Delhi-110095 — repeated on both client-provided documents and consistent in locality with IndiaMART and TradeIndia.
+- **Regional office:** the Raipur address above — repeated on both client-provided documents.
+- **Technical capabilities:** domestic and commercial RO systems, water purifiers, industrial water softeners, cooling-water treatment chemicals and boiler-water treatment chemicals — supported by the supplied client material.
+- **Sahibabad operating-location listing:** retained as a separate Justdial location record pending confirmation that it remains active; it is not merged with the corporate office.
+- **Operating hours:** Monday–Saturday, 9:30 AM–6:30 PM, Sunday closed — Justdial structured data only; client confirmation is still required.
 
 ## Conflicts and legal-identity caution
 
@@ -115,6 +146,8 @@ TradeIndia’s “Products You May Be Interested In” area names other sellers 
 - Justdial says establishment year 2011; TradeIndia says registered in 2020.
 - Justdial hours show Sunday closed; TradeIndia says Monday–Sunday working days.
 - IndiaMART’s “S Khan” may refer to TradeIndia’s “Mr. Sanjar Hussan Khan,” but the spelling and authority are not independently verified.
+- Client material uses `S.H. Khan`, while TradeIndia uses `Mr. Sanjar Hussan Khan` and IndiaMART uses `S Khan`; the expanded name and legal role require confirmation.
+- Client material uses `M-20/A-4, Dilshad Garden`; TradeIndia uses `M/20/4A, Ground Floor, Dilshad Garden`; Justdial lists a separate Sahibabad/Shalimar Garden location.
 - Official MCA notices list `ALPRON AQUA SOLUTIONS PRIVATE LIMITED`, CIN `U29220DL2011PTC213024`, in strike-off proceedings. The website must not publish “Pvt. Ltd.” or claim this company as the present legal entity without current client documents.
 
 ## Client confirmation checklist
@@ -122,13 +155,15 @@ TradeIndia’s “Products You May Be Interested In” area names other sellers 
 - Current legal entity name, type and status, plus any relationship to CIN `U29220DL2011PTC213024`
 - GST certificate and permission to publish the GST number
 - Exact proprietor/director/authorized-contact name and spelling
-- Whether the Sahibabad address is the current customer-facing operating address
-- Whether the Dilshad Garden address is the registered, correspondence or former address
-- Direct public phone, WhatsApp number and email (not a directory call-routing number)
+- Whether `S.H. Khan` may be expanded publicly and the person’s exact legal/business role
+- Whether the Sahibabad address remains a current customer-facing operating location
+- Whether the Dilshad Garden address is also the registered address, and which formatting is legally correct
+- Which of the two mobile numbers, if either, is the official WhatsApp number
 - Current operating hours and service/delivery area
 - Manufacturer, supplier, retailer, dealer, installer and repair-service roles
 - Aquafresh and Aquaguard brand authorization/dealership status
 - Product model/SKU, specifications, prices, price units, MOQs and current availability
 - Installation, warranty, after-sales service, delivery and payment terms
-- Logo, social links, product photographs and written permission to publish listing images
+- Current certificate and scope before publishing any ISO claim
+- Social links, genuine product photographs and written permission to publish listing images
 - Client/legal review of privacy policy and terms

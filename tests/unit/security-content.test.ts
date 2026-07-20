@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { safeBrandAssetUrl } from "@/lib/business";
 import { sanitizeRichDocument } from "@/lib/content";
 import { formatPrice, safeExternalUrl, slugify } from "@/lib/utils";
 
@@ -18,6 +19,21 @@ describe("content safety", () => {
   it("allows only HTTP external links", () => {
     expect(safeExternalUrl("https://example.com")).toBe("https://example.com/");
     expect(safeExternalUrl("javascript:alert(1)")).toBeNull();
+  });
+
+  it("allows only approved local or Supabase brand assets", () => {
+    expect(
+      safeBrandAssetUrl(
+        "/assets/brand/alpron-logo-horizontal-transparent.png",
+      ),
+    ).toBe("/assets/brand/alpron-logo-horizontal-transparent.png");
+    expect(
+      safeBrandAssetUrl(
+        "https://example.supabase.co/storage/v1/object/public/product-media/logo.png",
+      ),
+    ).toContain("example.supabase.co");
+    expect(safeBrandAssetUrl("https://example.com/logo.png")).toBeNull();
+    expect(safeBrandAssetUrl("javascript:alert(1)")).toBeNull();
   });
 });
 

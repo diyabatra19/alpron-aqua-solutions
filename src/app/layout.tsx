@@ -24,14 +24,30 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: settings.defaultSeoDescription,
     applicationName: settings.brandName,
+    icons: {
+      icon: "/assets/brand/alpron-logo-mark-transparent.png",
+      shortcut: "/assets/brand/alpron-logo-mark-transparent.png",
+      apple: "/assets/brand/alpron-logo-mark-transparent.png",
+    },
     openGraph: {
       type: "website",
       locale: "en_IN",
       siteName: settings.brandName,
       title: settings.defaultSeoTitle,
       description: settings.defaultSeoDescription,
+      images: [
+        {
+          url: "/assets/brand/alpron-logo-horizontal-white-bg.png",
+          width: 750,
+          height: 236,
+          alt: "Alpron Aqua Solutions logo",
+        },
+      ],
     },
-    twitter: { card: "summary_large_image" },
+    twitter: {
+      card: "summary_large_image",
+      images: ["/assets/brand/alpron-logo-horizontal-white-bg.png"],
+    },
     robots: { index: true, follow: true },
     verification: {
       google: process.env.GOOGLE_SITE_VERIFICATION || undefined,

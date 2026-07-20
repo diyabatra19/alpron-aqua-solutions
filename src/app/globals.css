@@ -30,9 +30,11 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
+  overflow-x: clip;
   margin: 0;
   background:
     radial-gradient(circle at 10% 0%, rgb(209 247 248 / 28%), transparent 28rem),
@@ -549,6 +551,7 @@ textarea {
 }
 
 .final-cta {
+  position: relative;
   display: grid;
   gap: 2rem;
   align-items: center;

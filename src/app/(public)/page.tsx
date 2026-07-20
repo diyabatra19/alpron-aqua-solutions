@@ -45,8 +45,13 @@ const applications = [
   },
   {
     icon: Layers3,
-    title: "Water filter requirements",
-    text: "Share the intended application so filter type, dimensions, availability and price can be confirmed.",
+    title: "Industrial water softeners",
+    text: "Share the feed-water and operating requirement so a suitable solution can be discussed and quoted.",
+  },
+  {
+    icon: Filter,
+    title: "Treatment chemicals",
+    text: "Discuss cooling-water or boiler-water treatment chemical requirements directly with the team.",
   },
 ];
 
@@ -143,7 +148,7 @@ export default async function HomePage() {
             </div>
             <ButtonLink href="/products" variant="secondary">View full catalogue</ButtonLink>
           </Reveal>
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
+          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {categories.map((category, index) => {
               const Icon = categoryIcons[index] || PackageCheck;
               return (

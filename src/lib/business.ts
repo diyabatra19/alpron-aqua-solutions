@@ -55,3 +55,24 @@ export function safePublicUrl(value: string | undefined) {
     return null;
   }
 }
+
+export function safeBrandAssetUrl(value: string | undefined) {
+  if (!value) return null;
+  if (
+    /^\/assets\/brand\/[a-z0-9][a-z0-9._-]*\.(?:avif|jpe?g|png|webp)$/i.test(
+      value,
+    )
+  ) {
+    return value;
+  }
+  try {
+    const url = new URL(value);
+    const isSupabaseAsset =
+      url.protocol === "https:" &&
+      url.hostname.endsWith(".supabase.co") &&
+      url.pathname.startsWith("/storage/v1/object/public/product-media/");
+    return isSupabaseAsset ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}

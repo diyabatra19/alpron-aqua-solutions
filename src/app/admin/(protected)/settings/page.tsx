@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   changePasswordAction,
   saveBusinessFactAction,
@@ -6,9 +7,29 @@ import {
 import { AdminPageHeader } from "@/components/admin-shell";
 import { StatusBadge } from "@/components/ui";
 import { requireAdmin } from "@/lib/auth";
+import { safeBrandAssetUrl } from "@/lib/business";
+import type { BusinessFact } from "@/lib/data";
 import { getBusinessFacts, getSiteSettings } from "@/lib/data";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+function LogoFactPreview({ fact }: { fact: BusinessFact }) {
+  if (!["primary_logo_url", "compact_logo_url"].includes(fact.key)) return null;
+  const src = safeBrandAssetUrl(fact.value || undefined);
+  if (!src) return null;
+  return (
+    <div className="mt-5 inline-flex min-h-24 min-w-40 items-center justify-center rounded-2xl border border-[#d9e4e8] bg-white p-4">
+      <Image
+        src={src}
+        alt={`${fact.label} preview`}
+        width={fact.key === "compact_logo_url" ? 120 : 320}
+        height={fact.key === "compact_logo_url" ? 105 : 98}
+        unoptimized
+        className="max-h-24 w-auto object-contain"
+      />
+    </div>
+  );
+}
 
 export default async function AdminSettingsPage({ searchParams }: { searchParams: SearchParams }) {
   await requireAdmin(["super_admin"]);
@@ -52,7 +73,13 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
                   <div><h3 className="font-bold text-[#072a47]">{fact.label}</h3>{fact.sourceUrl ? <p className="mt-1 text-xs text-[#6b7e8a]">Research source recorded</p> : null}</div>
                   <StatusBadge tone={fact.verificationStatus === "verified" ? "success" : fact.verificationStatus === "rejected" ? "danger" : "warning"}>{fact.verificationStatus}</StatusBadge>
                 </div>
+                <LogoFactPreview fact={fact} />
                 <div className="mt-5 field"><label htmlFor={`fact-${fact.id}`}>Value</label><textarea id={`fact-${fact.id}`} name="value" rows={2} maxLength={1000} defaultValue={fact.value || ""} /></div>
+                {["primary_logo_url", "compact_logo_url"].includes(fact.key) ? (
+                  <p className="mt-2 text-xs leading-5 text-[#6b7e8a]">
+                    Use a local `/assets/brand/...` path or an uploaded Supabase product-media URL. The public site rejects other image origins.
+                  </p>
+                ) : null}
                 <div className="mt-5 flex flex-wrap items-end gap-5">
                   <div className="field min-w-48"><label htmlFor={`verification-${fact.id}`}>Verification status</label><select id={`verification-${fact.id}`} name="verificationStatus" defaultValue={fact.verificationStatus}><option value="unverified">Unverified</option><option value="verified">Verified</option><option value="rejected">Rejected</option></select></div>
                   <label className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#425563]"><input type="checkbox" name="publicVisible" defaultChecked={fact.publicVisible} className="size-4 accent-[#007d91]" /> Show publicly</label>

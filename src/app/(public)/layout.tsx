@@ -15,7 +15,9 @@ export default async function PublicLayout({ children }: { children: ReactNode }
     url: getSiteUrl(),
     description: settings.defaultSeoDescription,
     address: byKey.address,
-    telephone: byKey.phone,
+    telephone: [byKey.phone, byKey.phone_secondary, byKey.telephone].filter(
+      Boolean,
+    ),
     email: byKey.email,
     openingHours: byKey.business_hours,
     areaServed: byKey.service_area,

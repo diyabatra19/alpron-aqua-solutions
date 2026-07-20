@@ -20,7 +20,10 @@ import type { BusinessFact } from "@/lib/data";
 export function SiteFooter({ facts }: { facts: BusinessFact[] }) {
   const byKey = businessFactsByKey(facts);
   const callHref = phoneHref(byKey.phone);
+  const secondaryPhoneHref = phoneHref(byKey.phone_secondary);
+  const landlineHref = phoneHref(byKey.telephone);
   const emailHref = mailHref(byKey.email);
+  const websiteHref = safePublicUrl(byKey.website);
   const chatHref = whatsappHref(
     byKey.whatsapp,
     "Hello Alpron Aqua Solutions, I would like to discuss a product requirement.",
@@ -36,7 +39,7 @@ export function SiteFooter({ facts }: { facts: BusinessFact[] }) {
       <div className="footer-glow pointer-events-none absolute inset-0" aria-hidden="true" />
       <div className="container-shell relative grid gap-12 py-16 md:grid-cols-[1.25fr_0.65fr_1.1fr] lg:py-20">
         <div>
-          <BrandMark inverse />
+          <BrandMark facts={facts} inverse compactOnMobile={false} />
           <p className="mt-6 max-w-sm text-sm leading-7 text-white/68">
             Manufacturer and supplier of RO water purifiers, purifier bodies
             and water filters. Product details are confirmed through a direct
@@ -79,6 +82,18 @@ export function SiteFooter({ facts }: { facts: BusinessFact[] }) {
                 <a href={callHref}>{byKey.phone}</a>
               </li>
             ) : null}
+            {secondaryPhoneHref ? (
+              <li className="flex gap-3">
+                <Phone className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                <a href={secondaryPhoneHref}>{byKey.phone_secondary}</a>
+              </li>
+            ) : null}
+            {landlineHref ? (
+              <li className="flex gap-3">
+                <Phone className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                <a href={landlineHref}>{byKey.telephone}</a>
+              </li>
+            ) : null}
             {chatHref ? (
               <li className="flex gap-3">
                 <MessageCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
@@ -95,6 +110,20 @@ export function SiteFooter({ facts }: { facts: BusinessFact[] }) {
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                 <span>{byKey.address}</span>
+              </li>
+            ) : null}
+            {byKey.regional_office ? (
+              <li className="flex gap-3">
+                <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                <span>Regional office: {byKey.regional_office}</span>
+              </li>
+            ) : null}
+            {websiteHref ? (
+              <li className="flex gap-3">
+                <ArrowUpRight className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                <a href={websiteHref} target="_blank" rel="noreferrer">
+                  {byKey.website?.replace(/^https?:\/\//, "")}
+                </a>
               </li>
             ) : null}
             {byKey.business_hours ? (

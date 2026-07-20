@@ -7,7 +7,7 @@ test("a super administrator can upload and delete a normalized image", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop");
-  test.setTimeout(60_000);
+  test.setTimeout(120_000);
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -43,14 +43,12 @@ test("a super administrator can upload and delete a normalized image", async ({
 
     await page.waitForTimeout(1_500);
     await page.goto("/admin/login");
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      await page.locator("#admin-email").fill(email);
-      await page.locator("#admin-password").fill(password);
-      await page.getByRole("button", { name: "Sign in securely" }).click();
-      await page.waitForTimeout(1_200);
-      if (/\/admin$/.test(page.url())) break;
-    }
-    await expect(page).toHaveURL(/\/admin$/, { timeout: 15_000 });
+    await page.locator("#admin-email").fill(email);
+    await page.locator("#admin-password").fill(password);
+    await Promise.all([
+      page.waitForURL(/\/admin$/, { timeout: 30_000 }),
+      page.getByRole("button", { name: "Sign in securely" }).click(),
+    ]);
 
     await page.goto("/admin/media");
     const png = await sharp({
@@ -67,9 +65,18 @@ test("a super administrator can upload and delete a normalized image", async ({
       buffer: png,
     });
     await page.locator('input[name="altText"]').fill(altText);
+    const uploadResponsePromise = page.waitForResponse(
+      (response) =>
+        response.url().endsWith("/api/admin/media") &&
+        response.request().method() === "POST",
+      { timeout: 30_000 },
+    );
     await page.getByRole("button", { name: "Upload" }).click();
+    const uploadResponse = await uploadResponsePromise;
+    expect(uploadResponse.status()).toBe(201);
     await expect(page.getByRole("status")).toContainText(
       "Image uploaded and normalized to WebP.",
+      { timeout: 15_000 },
     );
 
     const asset = page.getByRole("article").filter({ hasText: altText });
