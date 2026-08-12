@@ -34,6 +34,7 @@ export default async function AboutPage() {
     getBusinessFacts(),
   ]);
   const byKey = businessFactsByKey(facts);
+  const topLevelCategories = categories.filter((category) => !category.parentId);
 
   return (
     <>
@@ -92,8 +93,8 @@ export default async function AboutPage() {
             <span className="eyebrow">Product focus</span>
             <h2 className="section-title mt-5">A straightforward range, organised by requirement.</h2>
           </Reveal>
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
-            {categories.map((category, index) => (
+          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {topLevelCategories.map((category, index) => (
               <Reveal key={category.id} delay={index * 80}>
                 <div className="category-card h-full">
                   <PackageSearch className="size-6 text-[#00899b]" aria-hidden="true" />

@@ -2,11 +2,15 @@ import type { ReactNode } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { businessFactsByKey } from "@/lib/business";
-import { getBusinessFacts, getSiteSettings } from "@/lib/data";
+import { getBusinessFacts, getCategories, getSiteSettings } from "@/lib/data";
 import { getSiteUrl } from "@/lib/env";
 
 export default async function PublicLayout({ children }: { children: ReactNode }) {
-  const [facts, settings] = await Promise.all([getBusinessFacts(), getSiteSettings()]);
+  const [facts, settings, categories] = await Promise.all([
+    getBusinessFacts(),
+    getSiteSettings(),
+    getCategories(),
+  ]);
   const byKey = businessFactsByKey(facts);
   const organizationSchema = {
     "@context": "https://schema.org",
@@ -31,9 +35,9 @@ export default async function PublicLayout({ children }: { children: ReactNode }
           __html: JSON.stringify(organizationSchema).replace(/</g, "\\u003c"),
         }}
       />
-      <SiteHeader facts={facts} />
+      <SiteHeader facts={facts} categories={categories} />
       <main className="flex-1">{children}</main>
-      <SiteFooter facts={facts} />
+      <SiteFooter facts={facts} categories={categories} />
     </div>
   );
 }

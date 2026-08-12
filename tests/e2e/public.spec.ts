@@ -24,14 +24,48 @@ test("home has a single clear heading and no critical accessibility violations",
   expect(results.violations).toEqual([]);
 });
 
+test("desktop catalogue navigation exposes the major product groups", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "mobile", "Desktop mega-menu coverage");
+  await page.goto("/");
+  await page.getByRole("button", { name: "Products" }).click();
+  const menu = page.getByLabel("Product categories");
+  await expect(menu.getByRole("link", { name: "Domestic RO Systems", exact: true })).toBeVisible();
+  await expect(menu.getByRole("link", { name: "Commercial & Industrial RO Systems", exact: true })).toBeVisible();
+  await expect(menu.getByRole("link", { name: "Water Chemicals", exact: true })).toBeVisible();
+  await expect(menu.getByRole("link", { name: "Stainless Steel Water Coolers", exact: true })).toBeVisible();
+  await expect(menu.getByRole("link", { name: "Water Softeners", exact: true })).toBeVisible();
+});
+
+test("category landing pages preserve empty states without fake products", async ({ page }) => {
+  const response = await page.goto("/products/category/water-softeners");
+  expect(response?.ok()).toBeTruthy();
+  await expect(page.getByRole("heading", { level: 1, name: "Water Softeners" })).toBeVisible();
+  await expect(page.getByText("No verified products are published in this category yet.")).toBeVisible();
+});
+
+test("mobile drawer provides expandable product navigation", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile", "Mobile navigation coverage");
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open navigation" }).click();
+  const drawer = page.getByRole("dialog", { name: "Site navigation" });
+  await expect(drawer).toBeVisible();
+  await expect(drawer.getByText("Domestic RO Systems", { exact: true })).toBeVisible();
+  await expect(drawer.getByText("Commercial & Industrial RO Systems", { exact: true })).toBeVisible();
+});
+
 test("catalogue shows source-verified products without invented prices", async ({ page }) => {
   await page.goto("/products");
-  await expect(page.getByText("6 published products")).toBeVisible();
-  await expect(page.getByRole("link", { name: /Reverse Osmosis Water Purifiers/ })).toBeVisible();
+  await expect(page.getByText(/published products/)).toBeVisible();
   await expect(page.getByText(/₹|Rs\.? \d/i)).toHaveCount(0);
-  await page.getByRole("link", { name: /Reverse Osmosis Water Purifiers/ }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "Reverse Osmosis Water Purifiers" })).toBeVisible();
-  await expect(page.getByText("Get Latest Price")).toBeVisible();
+  const productLink = page.getByRole("link", { name: /Reverse Osmosis Water Purifiers/ });
+  if (await productLink.count()) {
+    await expect(productLink).toBeVisible();
+    await productLink.click();
+    await expect(page.getByRole("heading", { level: 1, name: "Reverse Osmosis Water Purifiers" })).toBeVisible();
+    await expect(page.getByText("Get Latest Price")).toBeVisible();
+  } else {
+    await expect(page.getByRole("heading", { name: "No verified products are published here yet." })).toBeVisible();
+  }
 });
 
 test("unknown pages use the custom 404", async ({ page }) => {

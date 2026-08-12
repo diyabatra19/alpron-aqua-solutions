@@ -103,7 +103,7 @@ export default async function ProductDetailPage({ params }: { params: ProductPar
         <nav aria-label="Breadcrumb" className="container-shell flex flex-wrap items-center gap-2 py-4 text-xs text-[#5b6e7a]">
           <Link href="/">Home</Link><ChevronRight className="size-3" aria-hidden="true" />
           <Link href="/products">Products</Link><ChevronRight className="size-3" aria-hidden="true" />
-          <Link href={`/products?category=${product.categorySlug}`}>{product.categoryName}</Link>
+          <Link href={`/products/category/${product.categorySlug}`}>{product.categoryName}</Link>
         </nav>
       </div>
       <section className="section-pad">

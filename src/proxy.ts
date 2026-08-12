@@ -4,7 +4,7 @@ import { getSupabasePublicEnv, isSupabaseConfigured } from "@/lib/env";
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
-  if (!isSupabaseConfigured()) {
+  if (!isSupabaseConfigured() || process.env.E2E_OFFLINE === "true") {
     if (
       request.nextUrl.pathname.startsWith("/admin") &&
       request.nextUrl.pathname !== "/admin/login"

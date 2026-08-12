@@ -5,9 +5,13 @@ import { StatusBadge } from "@/components/ui";
 import { archiveProductAction, saveProductAction } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/auth";
 import { documentToPlainText } from "@/lib/content";
-import { getCategories, getMediaAssets, getProducts } from "@/lib/data";
+import { buildCategoryTree, getCategories, getMediaAssets, getProducts, type CategoryNode } from "@/lib/data";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+function flattenCategories(nodes: CategoryNode[], depth = 0): Array<{ category: CategoryNode; depth: number }> {
+  return nodes.flatMap((category) => [{ category, depth }, ...flattenCategories(category.children, depth + 1)]);
+}
 
 export default async function AdminProductsPage({ searchParams }: { searchParams: SearchParams }) {
   await requireAdmin(["super_admin", "content_editor"]);
@@ -20,6 +24,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
   const selected = typeof params.edit === "string" ? result.products.find((item) => item.id === params.edit) : undefined;
   const selectedSpecs = selected?.specifications.map((item) => `${item.key}: ${item.value}`).join("\n") || "";
   const selectedMedia = selected?.images.map((item) => item.mediaAssetId).join("\n") || "";
+  const categoryOptions = flattenCategories(buildCategoryTree(categories));
   return (
     <>
       <AdminPageHeader
@@ -63,7 +68,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
             <div className="field"><label htmlFor="product-name">Product name *</label><input id="product-name" name="name" required maxLength={160} defaultValue={selected?.name} /></div>
             <div className="field"><label htmlFor="product-slug">URL slug</label><input id="product-slug" name="slug" maxLength={100} defaultValue={selected?.slug} /><span className="field-help">Generated from the name when blank.</span></div>
             <div className="field"><label htmlFor="product-sku">SKU / model</label><input id="product-sku" name="sku" maxLength={80} defaultValue={selected?.sku || ""} /></div>
-            <div className="field"><label htmlFor="product-category">Category *</label><select id="product-category" name="categoryId" required defaultValue={selected?.categoryId}><option value="">Select category</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></div>
+            <div className="field"><label htmlFor="product-category">Category *</label><select id="product-category" name="categoryId" required defaultValue={selected?.categoryId}><option value="">Select category</option>{categoryOptions.map(({ category, depth }) => <option key={category.id} value={category.id}>{`${"— ".repeat(depth)}${category.name}`}</option>)}</select></div>
           </div>
           <div className="field"><label htmlFor="product-short">Short description *</label><textarea id="product-short" name="shortDescription" required minLength={10} maxLength={500} rows={3} defaultValue={selected?.shortDescription} /></div>
           <div className="field"><label htmlFor="product-full">Full description</label><textarea id="product-full" name="fullDescription" maxLength={10000} rows={8} defaultValue={selected ? documentToPlainText(selected.fullDescription) : ""} /><span className="field-help">Paragraph breaks are preserved. Unsafe HTML is not accepted.</span></div>

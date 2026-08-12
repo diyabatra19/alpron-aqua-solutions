@@ -13,6 +13,11 @@ test("a super administrator can upload and delete a normalized image", async ({
   const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   test.skip(!url || !publishableKey || !serviceRoleKey, "Supabase is not configured.");
+  const supabaseReachable = await fetch(`${url}/auth/v1/health`, {
+    headers: { apikey: publishableKey! },
+    signal: AbortSignal.timeout(10_000),
+  }).then((response) => response.ok).catch(() => false);
+  test.skip(!supabaseReachable, "The configured Supabase project is not reachable.");
 
   const service = createClient(url!, serviceRoleKey!, {
     auth: { persistSession: false, autoRefreshToken: false },

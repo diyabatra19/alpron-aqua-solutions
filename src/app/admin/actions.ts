@@ -28,21 +28,43 @@ export async function saveCategoryAction(formData: FormData) {
     id: z.union([z.literal(""), z.uuid()]).transform((value) => value || undefined),
     name: z.string().trim().min(2).max(120),
     slug: z.string().trim().max(100).transform(slugify),
+    parentId: z.union([z.literal(""), z.uuid()]).transform((value) => value || null),
+    mediaAssetId: z.union([z.literal(""), z.uuid()]).transform((value) => value || null),
     description: z.string().trim().max(500),
     imageAlt: z.string().trim().max(180),
+    isActive: z.boolean(),
     displayOrder: z.coerce.number().int().min(-10000).max(10000),
     status: z.enum(["draft", "published", "archived"]),
     seoTitle: z.string().trim().max(70),
     seoDescription: z.string().trim().max(170),
   });
-  const parsed = schema.parse(Object.fromEntries(formData));
+  const parsed = schema.parse({
+    ...Object.fromEntries(formData),
+    isActive: formData.has("isActive"),
+  });
   const client = await getClient();
+  if (parsed.id && parsed.parentId) {
+    const { data: categories } = await client
+      .from("categories")
+      .select("id,parent_id");
+    const byId = new Map((categories || []).map((category) => [category.id, category.parent_id]));
+    let current: string | null = parsed.parentId;
+    for (let depth = 0; current && depth < 100; depth += 1) {
+      if (current === parsed.id) {
+        throw new Error("A category cannot be placed below itself or one of its children.");
+      }
+      current = byId.get(current) || null;
+    }
+  }
   const record = {
     id: parsed.id,
     name: parsed.name,
     slug: parsed.slug || slugify(parsed.name),
+    parent_id: parsed.parentId,
+    media_asset_id: parsed.mediaAssetId,
     description: parsed.description,
     image_alt: parsed.imageAlt,
+    is_active: parsed.isActive,
     display_order: parsed.displayOrder,
     status: parsed.status,
     seo_title: parsed.seoTitle || null,
@@ -55,9 +77,12 @@ export async function saveCategoryAction(formData: FormData) {
     event_type: "category.saved",
     entity_type: "category",
     entity_id: parsed.id || record.slug,
+    metadata: { parentId: parsed.parentId, isActive: parsed.isActive },
   });
   revalidatePath("/", "layout");
   revalidatePath("/products");
+  revalidatePath("/products/category/[slug]", "page");
+  revalidatePath("/sitemap.xml");
   redirect("/admin/categories?saved=1");
 }
 

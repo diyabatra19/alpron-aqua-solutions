@@ -9,7 +9,7 @@ import {
 } from "@/lib/env";
 
 export async function createServerSupabaseClient() {
-  if (!isSupabaseConfigured()) return null;
+  if (!isSupabaseConfigured() || process.env.E2E_OFFLINE === "true") return null;
   const cookieStore = await cookies();
   const { url, publishableKey } = getSupabasePublicEnv();
 

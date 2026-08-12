@@ -5,6 +5,7 @@ import type {
   ProductStatus,
   VerificationStatus,
 } from "@/lib/database.types";
+import { cache } from "react";
 import { isSupabaseConfigured } from "@/lib/env";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -14,11 +15,19 @@ export type Category = {
   slug: string;
   description: string;
   imageAlt: string;
+  parentId: string | null;
+  mediaAssetId: string | null;
+  imageUrl: string | null;
+  imageWidth: number | null;
+  imageHeight: number | null;
+  isActive: boolean;
   displayOrder: number;
   status: ProductStatus;
   seoTitle: string | null;
   seoDescription: string | null;
 };
+
+export type CategoryNode = Category & { children: CategoryNode[] };
 
 export type ProductImage = {
   id: string;
@@ -122,60 +131,361 @@ export type Inquiry = {
 const fallbackCategories: Category[] = [
   {
     id: "00000000-0000-4000-8000-000000000001",
-    name: "RO Water Purifiers",
-    slug: "ro-water-purifiers",
+    name: "Domestic RO Systems",
+    slug: "domestic-ro-systems",
     description:
-      "Explore RO water purifier options after product details are verified and published.",
-    imageAlt:
-      "RO water purifier category placeholder awaiting approved product photography",
+      "Domestic reverse-osmosis and multi-stage purifier categories for household requirements.",
+    imageAlt: "Domestic RO filtration system",
+    parentId: null,
+    mediaAssetId: null,
+    imageUrl: null,
+    imageWidth: null,
+    imageHeight: null,
+    isActive: true,
     displayOrder: 10,
     status: "published",
-    seoTitle: "RO Water Purifiers | Alpron Aqua Solutions",
+    seoTitle: "Domestic RO Systems | Alpron Aqua Solutions",
     seoDescription:
-      "Browse published RO water purifier options from Alpron Aqua Solutions.",
+      "Explore domestic RO system categories from Alpron Aqua Solutions.",
   },
   {
     id: "00000000-0000-4000-8000-000000000002",
-    name: "RO Water Purifier Bodies",
-    slug: "ro-water-purifier-bodies",
+    name: "Commercial & Industrial RO Systems",
+    slug: "commercial-industrial-ro-systems",
     description:
-      "Purifier body options will appear after models and specifications are confirmed.",
-    imageAlt:
-      "RO water purifier body category placeholder awaiting approved product photography",
+      "Commercial and industrial reverse-osmosis plant categories organised by capacity, equipment and application.",
+    imageAlt: "Commercial reverse-osmosis plant",
+    parentId: null,
+    mediaAssetId: null,
+    imageUrl: null,
+    imageWidth: null,
+    imageHeight: null,
+    isActive: true,
     displayOrder: 20,
     status: "published",
-    seoTitle: "RO Water Purifier Bodies | Alpron Aqua Solutions",
+    seoTitle: "Commercial & Industrial RO Systems | Alpron Aqua Solutions",
     seoDescription:
-      "Browse published RO water purifier body options from Alpron Aqua Solutions.",
+      "Explore commercial and industrial RO system categories from Alpron Aqua Solutions.",
   },
   {
     id: "00000000-0000-4000-8000-000000000003",
-    name: "Water Filters",
-    slug: "water-filters",
+    name: "Water Chemicals",
+    slug: "water-chemicals",
     description:
-      "Water filter products will appear after specifications are approved.",
-    imageAlt: "Water filter category placeholder awaiting approved product photography",
+      "RO, boiler, cooling-tower and water-treatment chemical categories for requirement-led enquiries.",
+    imageAlt: "Water treatment chemical category",
+    parentId: null,
+    mediaAssetId: null,
+    imageUrl: null,
+    imageWidth: null,
+    imageHeight: null,
+    isActive: true,
     displayOrder: 30,
     status: "published",
-    seoTitle: "Water Filters | Alpron Aqua Solutions",
+    seoTitle: "Water Treatment Chemicals | Alpron Aqua Solutions",
     seoDescription:
-      "Browse published water filter options from Alpron Aqua Solutions.",
+      "Explore water treatment chemical categories from Alpron Aqua Solutions.",
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000004",
+    name: "Stainless Steel Water Coolers",
+    slug: "stainless-steel-water-coolers",
+    description: "Stainless-steel water cooler categories by installation, application and capacity.",
+    imageAlt: "Stainless steel water cooler category",
+    parentId: null,
+    mediaAssetId: null,
+    imageUrl: null,
+    imageWidth: null,
+    imageHeight: null,
+    isActive: true,
+    displayOrder: 40,
+    status: "published",
+    seoTitle: "Stainless Steel Water Coolers | Alpron Aqua Solutions",
+    seoDescription: "Explore stainless steel water cooler categories from Alpron Aqua Solutions.",
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000005",
+    name: "Water Softeners",
+    slug: "water-softeners",
+    description: "Domestic, commercial and industrial water-softener categories with related accessories.",
+    imageAlt: "Water softener system category",
+    parentId: null,
+    mediaAssetId: null,
+    imageUrl: null,
+    imageWidth: null,
+    imageHeight: null,
+    isActive: true,
+    displayOrder: 50,
+    status: "published",
+    seoTitle: "Water Softeners | Alpron Aqua Solutions",
+    seoDescription: "Explore water softener categories from Alpron Aqua Solutions.",
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000006",
+    name: "Spare Parts",
+    slug: "spare-parts",
+    description: "Replacement components and consumables for purifier and water-treatment requirements.",
+    imageAlt: "RO spare parts and components category",
+    parentId: null,
+    mediaAssetId: null,
+    imageUrl: null,
+    imageWidth: null,
+    imageHeight: null,
+    isActive: true,
+    displayOrder: 60,
+    status: "published",
+    seoTitle: "RO Spare Parts | Alpron Aqua Solutions",
+    seoDescription: "Explore RO spare parts and component categories from Alpron Aqua Solutions.",
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000007",
+    name: "Installation & Services",
+    slug: "installation-services",
+    description: "Installation, maintenance, testing and commissioning service categories.",
+    imageAlt: "RO installation and maintenance category",
+    parentId: null,
+    mediaAssetId: null,
+    imageUrl: null,
+    imageWidth: null,
+    imageHeight: null,
+    isActive: true,
+    displayOrder: 70,
+    status: "published",
+    seoTitle: "RO Installation & Services | Alpron Aqua Solutions",
+    seoDescription: "Explore RO installation and maintenance service categories.",
   },
 ];
 
+type FallbackCategoryBranch = {
+  name: string;
+  slug: string;
+  children?: FallbackCategoryBranch[];
+};
+
+const fallbackCategoryBranches: Record<string, FallbackCategoryBranch[]> = {
+  "domestic-ro-systems": [
+    { name: "Under Sink RO", slug: "under-sink-ro" },
+    { name: "Wall Mount RO", slug: "wall-mount-ro" },
+    { name: "Table Top RO", slug: "table-top-ro" },
+    { name: "RO + UV Water Purifier", slug: "ro-uv-water-purifier" },
+    { name: "RO + UF Water Purifier", slug: "ro-uf-water-purifier" },
+    { name: "RO + UV + UF + TDS Controller", slug: "ro-uv-uf-tds-controller" },
+    { name: "Copper RO", slug: "copper-ro" },
+    { name: "Alkaline RO", slug: "alkaline-ro" },
+    { name: "Hot & Normal RO", slug: "hot-normal-ro" },
+    { name: "Smart RO Purifiers", slug: "smart-ro-purifiers" },
+    {
+      name: "Domestic Spare Parts",
+      slug: "domestic-ro-spare-parts",
+      children: [
+        ["RO Membranes", "domestic-ro-membranes"],
+        ["Sediment Filters", "domestic-sediment-filters"],
+        ["Carbon Filters", "domestic-carbon-filters"],
+        ["Post Carbon Filters", "domestic-post-carbon-filters"],
+        ["UV Lamps", "domestic-uv-lamps"],
+        ["Booster Pumps", "domestic-booster-pumps"],
+        ["Solenoid Valves", "domestic-solenoid-valves"],
+        ["SMPS/Adapters", "domestic-smps-adapters"],
+        ["Faucets", "domestic-faucets"],
+        ["Storage Tanks", "domestic-storage-tanks"],
+      ].map(([name, slug]) => ({ name, slug })),
+    },
+  ],
+  "commercial-industrial-ro-systems": [
+    {
+      name: "Commercial RO Plants",
+      slug: "commercial-ro-plants",
+      children: [25, 50, 100, 250, 500, 1000].map((capacity) => ({
+        name: `${capacity} LPH`, slug: `commercial-ro-${capacity}-lph`,
+      })),
+    },
+    {
+      name: "Industrial RO Plants",
+      slug: "industrial-ro-plants",
+      children: [2000, 3000, 5000, 10000].map((capacity) => ({
+        name: `${capacity} LPH`, slug: `industrial-ro-${capacity}-lph`,
+      })),
+    },
+    { name: "Customized RO Plants", slug: "customized-ro-plants" },
+    {
+      name: "Industrial Equipment",
+      slug: "industrial-equipment",
+      children: [
+        ["FRP Pressure Vessels", "frp-pressure-vessels"],
+        ["Multiport Valves", "industrial-multiport-valves"],
+        ["Dosing Systems", "dosing-systems"],
+        ["Sand Filters", "sand-filters"],
+        ["Activated Carbon Filters", "activated-carbon-filters"],
+        ["Micron Cartridge Filters", "micron-cartridge-filters"],
+        ["Membrane Housings", "industrial-membrane-housings"],
+        ["High Pressure Pumps", "high-pressure-pumps"],
+        ["Control Panels", "control-panels"],
+        ["UV Systems", "industrial-uv-systems"],
+        ["Ozonators", "ozonators"],
+      ].map(([name, slug]) => ({ name, slug })),
+    },
+    {
+      name: "Plant Accessories",
+      slug: "plant-accessories",
+      children: [
+        ["Flow Meters", "flow-meters"],
+        ["Pressure Gauges", "pressure-gauges"],
+        ["Conductivity/TDS Meters", "conductivity-tds-meters"],
+        ["Dosing Pumps", "dosing-pumps"],
+        ["Float Switches", "plant-float-switches"],
+        ["Pipes & Fittings", "pipes-fittings"],
+      ].map(([name, slug]) => ({ name, slug })),
+    },
+  ],
+  "water-chemicals": [
+    {
+      name: "RO Chemicals", slug: "ro-chemicals",
+      children: [
+        ["Antiscalant", "antiscalant"],
+        ["Membrane Cleaner (Acidic)", "membrane-cleaner-acidic"],
+        ["Membrane Cleaner (Alkaline)", "membrane-cleaner-alkaline"],
+        ["Biocide", "ro-biocide"],
+        ["Chlorine Tablets", "chlorine-tablets"],
+        ["Sodium Hypochlorite", "sodium-hypochlorite"],
+      ].map(([name, slug]) => ({ name, slug })),
+    },
+    {
+      name: "Boiler Chemicals", slug: "boiler-chemicals",
+      children: [
+        ["Oxygen Scavenger", "oxygen-scavenger"],
+        ["Scale Inhibitor", "boiler-scale-inhibitor"],
+        ["Boiler Treatment Chemicals", "boiler-treatment-chemicals"],
+      ].map(([name, slug]) => ({ name, slug })),
+    },
+    {
+      name: "Cooling Tower Chemicals", slug: "cooling-tower-chemicals",
+      children: [
+        ["Corrosion Inhibitor", "corrosion-inhibitor"],
+        ["Scale Inhibitor", "cooling-tower-scale-inhibitor"],
+        ["Algaecide", "algaecide"],
+        ["Biocide", "cooling-tower-biocide"],
+      ].map(([name, slug]) => ({ name, slug })),
+    },
+    {
+      name: "Water Treatment Chemicals", slug: "water-treatment-chemicals",
+      children: [
+        ["pH Booster", "ph-booster"],
+        ["pH Reducer", "ph-reducer"],
+        ["Activated Carbon Media", "activated-carbon-media"],
+        ["Silica Sand", "silica-sand"],
+        ["Resin Cleaner", "resin-cleaner"],
+      ].map(([name, slug]) => ({ name, slug })),
+    },
+  ],
+  "stainless-steel-water-coolers": [
+    ...[
+      ["Wall Mounted Water Coolers", "wall-mounted-water-coolers"],
+      ["Floor Standing Water Coolers", "floor-standing-water-coolers"],
+      ["Storage Water Coolers", "storage-water-coolers"],
+      ["Bottled Water Coolers", "bottled-water-coolers"],
+      ["Industrial Water Coolers", "industrial-water-coolers"],
+      ["School Water Coolers", "school-water-coolers"],
+      ["Railway/Station Water Coolers", "railway-station-water-coolers"],
+      ["Water Cooler with RO", "water-cooler-with-ro"],
+      ["Water Cooler with Inbuilt Purifier", "water-cooler-inbuilt-purifier"],
+    ].map(([name, slug]) => ({ name, slug })),
+    {
+      name: "Capacity", slug: "water-cooler-capacity",
+      children: [20, 40, 60, 80, 120, 150, 200].map((capacity) => ({
+        name: `${capacity} L`, slug: `water-cooler-${capacity}-l`,
+      })),
+    },
+  ],
+  "water-softeners": [
+    {
+      name: "Domestic Water Softeners", slug: "domestic-water-softeners",
+      children: [
+        ["Bathroom Softener", "bathroom-softener"],
+        ["Whole House Softener", "whole-house-softener"],
+        ["Apartment Softener", "apartment-softener"],
+      ].map(([name, slug]) => ({ name, slug })),
+    },
+    {
+      name: "Commercial Water Softeners", slug: "commercial-water-softeners",
+      children: ["Hotels", "Restaurants", "Hospitals", "Schools"].map((name) => ({
+        name, slug: `commercial-softeners-${name.toLowerCase()}`,
+      })),
+    },
+    {
+      name: "Industrial Water Softeners", slug: "industrial-water-softeners",
+      children: [
+        ["Boiler Feed Softener", "boiler-feed-softener"],
+        ["Cooling Tower Softener", "cooling-tower-softener"],
+        ["Process Water Softener", "process-water-softener"],
+      ].map(([name, slug]) => ({ name, slug })),
+    },
+    {
+      name: "Softener Accessories", slug: "softener-accessories",
+      children: [
+        ["Ion Exchange Resin", "ion-exchange-resin"],
+        ["Brine Tank", "brine-tank"],
+        ["Multiport Valve", "softener-multiport-valve"],
+        ["FRP Vessel", "softener-frp-vessel"],
+        ["Salt Tablets", "salt-tablets"],
+      ].map(([name, slug]) => ({ name, slug })),
+    },
+  ],
+  "spare-parts": [
+    "Membranes", "Filter Cartridges", "Pumps", "Valves", "Housings", "Connectors",
+    "Faucets", "Tubing", "SMPS", "Float Switches",
+  ].map((name) => ({ name, slug: `spare-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}` })),
+  "installation-services": [
+    "RO Installation", "AMC (Annual Maintenance Contract)", "RO Repair", "Membrane Replacement",
+    "Filter Replacement", "Water Testing", "Plant Commissioning", "Plant Maintenance",
+  ].map((name) => ({
+    name,
+    slug: `service-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`,
+  })),
+};
+
+let fallbackCategorySequence = 100;
+function appendFallbackBranches(parent: Category, branches: FallbackCategoryBranch[]) {
+  branches.forEach((branch, index) => {
+    fallbackCategorySequence += 1;
+    const category: Category = {
+      id: `00000000-0000-4000-8000-${String(fallbackCategorySequence).padStart(12, "0")}`,
+      name: branch.name,
+      slug: branch.slug,
+      description: `${branch.name} category for requirement-led product and quotation enquiries.`,
+      imageAlt: `${branch.name} category`,
+      parentId: parent.id,
+      mediaAssetId: null,
+      imageUrl: null,
+      imageWidth: null,
+      imageHeight: null,
+      isActive: true,
+      displayOrder: (index + 1) * 10,
+      status: "published",
+      seoTitle: `${branch.name} | Alpron Aqua Solutions`,
+      seoDescription: `Explore the ${branch.name} category from Alpron Aqua Solutions.`,
+    };
+    fallbackCategories.push(category);
+    if (branch.children) appendFallbackBranches(category, branch.children);
+  });
+}
+
+for (const root of fallbackCategories.slice(0, 7)) {
+  appendFallbackBranches(root, fallbackCategoryBranches[root.slug] || []);
+}
+
 const fallbackSettings: SiteSettings = {
   brandName: "Alpron Aqua Solutions",
-  defaultSeoTitle: "Alpron Aqua Solutions | RO Water Purifiers & Filters",
+  defaultSeoTitle: "Alpron Aqua Solutions | Water Treatment Solutions",
   defaultSeoDescription:
-    "RO water purifier products, purifier bodies and water filters for enquiries across Delhi/NCR.",
-  heroTitle: "Water purification products, presented with clarity.",
+    "Domestic, commercial and industrial water-treatment categories from Alpron Aqua Solutions.",
+  heroTitle: "Complete water treatment solutions for homes, businesses & industry",
   heroDescription:
-    "Explore RO water purifiers, purifier bodies and water filters, then request a quotation for confirmed product details.",
-  aboutTitle: "Water purification products for practical requirements.",
+    "Explore domestic RO systems, commercial and industrial RO plants, water-treatment chemicals, stainless-steel water coolers, water softeners, spare parts and related services.",
+  aboutTitle: "A practical catalogue across purification, treatment and system support.",
   aboutSummary:
-    "Alpron Aqua Solutions supplies RO water purifiers, purifier bodies and water filters through a quotation-led catalogue.",
+    "Alpron Aqua Solutions presents domestic, commercial and industrial water-treatment categories through a quotation-led catalogue.",
   whyChooseIntro:
-    "Clear product categories and verified public information make it easier to discuss the right requirement.",
+    "The catalogue brings purification systems, treatment equipment, chemicals, components and service requirements into one clear enquiry process.",
   orderingIntro:
     "Every order begins with a product enquiry so the applicable details can be confirmed.",
   orderingProcess: [
@@ -188,9 +498,9 @@ const fallbackSettings: SiteSettings = {
   ],
   contactIntro:
     "Send a product or general quotation enquiry with your city, quantity and requirement.",
-  ctaTitle: "Ready to discuss a purifier or supply requirement?",
+  ctaTitle: "Looking for the right water treatment solution?",
   ctaDescription:
-    "Choose a product or send a general enquiry for confirmed availability and pricing.",
+    "Tell us what you need and the team can help identify an appropriate category and prepare a confirmed quotation.",
 };
 
 const fallbackPages: Record<string, EditablePage> = {
@@ -279,24 +589,91 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   };
 }
 
-export async function getCategories(includeUnpublished = false): Promise<Category[]> {
+export const getCategories = cache(async (includeUnpublished = false): Promise<Category[]> => {
   const client = await createServerSupabaseClient();
   if (!client) return fallbackCategories;
-  let query = client.from("categories").select("*").order("display_order");
-  if (!includeUnpublished) query = query.eq("status", "published");
-  const { data } = await query;
-  if (!data) return [];
-  return data.map((category) => ({
-    id: category.id,
-    name: category.name,
-    slug: category.slug,
-    description: category.description,
-    imageAlt: category.image_alt,
-    displayOrder: category.display_order,
-    status: category.status,
-    seoTitle: category.seo_title,
-    seoDescription: category.seo_description,
-  }));
+  let query = client
+    .from("categories")
+    .select("*")
+    .order("display_order")
+    .order("name");
+  if (!includeUnpublished) {
+    query = query.eq("status", "published").eq("is_active", true);
+  }
+  const { data, error } = await query;
+  if (error || !data) return fallbackCategories;
+  const mediaIds = data
+    .map((category) => category.media_asset_id)
+    .filter((id): id is string => Boolean(id));
+  const { data: media } = mediaIds.length
+    ? await client
+        .from("media_assets")
+        .select("id,public_url,width,height,alt_text")
+        .in("id", mediaIds)
+    : { data: [] };
+  const mediaById = new Map((media || []).map((asset) => [asset.id, asset]));
+  return data.map((category) => {
+    const image = category.media_asset_id
+      ? mediaById.get(category.media_asset_id)
+      : null;
+    return {
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+      description: category.description,
+      imageAlt: image?.alt_text || category.image_alt,
+      parentId: category.parent_id,
+      mediaAssetId: category.media_asset_id,
+      imageUrl: image?.public_url || null,
+      imageWidth: image?.width || null,
+      imageHeight: image?.height || null,
+      isActive: category.is_active,
+      displayOrder: category.display_order,
+      status: category.status,
+      seoTitle: category.seo_title,
+      seoDescription: category.seo_description,
+    };
+  });
+});
+
+export function buildCategoryTree(categories: Category[]): CategoryNode[] {
+  const nodes = new Map<string, CategoryNode>(
+    categories.map((category) => [category.id, { ...category, children: [] }]),
+  );
+  const roots: CategoryNode[] = [];
+  for (const category of categories) {
+    const node = nodes.get(category.id);
+    if (!node) continue;
+    const parent = category.parentId ? nodes.get(category.parentId) : null;
+    if (parent) parent.children.push(node);
+    else roots.push(node);
+  }
+  const sort = (items: CategoryNode[]) => {
+    items.sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
+    items.forEach((item) => sort(item.children));
+  };
+  sort(roots);
+  return roots;
+}
+
+export function getCategoryDescendantIds(categories: Category[], categoryId: string) {
+  const ids = new Set([categoryId]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const category of categories) {
+      if (category.parentId && ids.has(category.parentId) && !ids.has(category.id)) {
+        ids.add(category.id);
+        changed = true;
+      }
+    }
+  }
+  return [...ids];
+}
+
+export async function getCategoryBySlug(slug: string, includeUnpublished = false) {
+  const categories = await getCategories(includeUnpublished);
+  return categories.find((category) => category.slug === slug) || null;
 }
 
 type RawProduct = Record<string, unknown> & {
@@ -427,7 +804,7 @@ export async function getProducts(options?: {
     const categories = await getCategories(options.includeUnpublished);
     const category = categories.find((item) => item.slug === options.category);
     if (!category) return { products: [] as Product[], count: 0, page, pageSize };
-    query = query.eq("category_id", category.id);
+    query = query.in("category_id", getCategoryDescendantIds(categories, category.id));
   }
 
   if (options?.sort === "name") query = query.order("name");

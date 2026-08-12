@@ -50,6 +50,9 @@ export type Database = {
           slug: string;
           description: string;
           image_alt: string;
+          parent_id: string | null;
+          media_asset_id: string | null;
+          is_active: boolean;
           display_order: number;
           status: ProductStatus;
           seo_title: string | null;
